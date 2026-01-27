@@ -42,34 +42,43 @@
                 <h2 class="text-2xl font-bold mb-2 text-blue-600">CCTP V2 Fee Query</h2>
                 <p class="text-sm text-gray-500 mb-6">Check Transfer and Forward fees across CCTP domains.</p>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div class="space-y-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">Network</label>
+                            <label class="block text-sm font-medium text-gray-700">Network Environment</label>
                             <select id="feeNetwork" class="mt-1 block w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
                                 <option value="mainnet">Mainnet</option>
                                 <option value="testnet">Testnet (Sandbox)</option>
                             </select>
                         </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Source</label>
-                                <select id="feeSource" class="mt-1 block w-full py-2 border border-gray-300 rounded-md"></select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Destination</label>
-                                <select id="feeDest" class="mt-1 block w-full py-2 border border-gray-300 rounded-md"></select>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Source Domain</label>
+                            <select id="feeSource" class="mt-1 block w-full py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"></select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Destination Domain</label>
+                            <select id="feeDest" class="mt-1 block w-full py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"></select>
+                        </div>
+
+                        <div class="flex items-center space-x-2 pt-2">
+                            <input type="checkbox" id="feeForward" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                            <label for="feeForward" class="text-sm font-medium text-gray-700 cursor-pointer">Forward Fee? (Optional)</label>
+                        </div>
+
+                        <button onclick="fetchFee()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-sm transition">Fetch Fee Data</button>
+                    </div>
+
+                    <div class="flex flex-col space-y-4">
+                        <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 flex-grow h-fit">
+                            <h3 class="text-xs font-bold text-blue-800 uppercase tracking-wider mb-2">Endpoint URL</h3>
+                            <p id="feeUrl" class="text-[11px] break-all font-mono bg-blue-100 p-2 rounded text-blue-900 border border-blue-200">Loading...</p>
+                            <div class="mt-4 text-xs text-gray-600 space-y-1">
+                                <p>• <b>Transfer Fee:</b> Standard CCTP burn/mint fee.</p>
+                                <p>• <b>Forward Fee:</b> Fee for automatic execution via forwarder contract.</p>
                             </div>
                         </div>
-                        <label class="flex items-center space-x-2 cursor-pointer">
-                            <input type="checkbox" id="feeForward" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
-                            <span class="text-sm font-medium text-gray-700">Forward Fee?</span>
-                        </label>
-                        <button onclick="fetchFee()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded">Fetch Fees</button>
-                    </div>
-                    <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 h-fit">
-                        <h3 class="text-xs font-bold text-blue-800 uppercase mb-2">Endpoint URL</h3>
-                        <p id="feeUrl" class="text-[10px] break-all font-mono bg-blue-100 p-2 rounded text-blue-900">Loading...</p>
                     </div>
                 </div>
             </div>
@@ -78,30 +87,30 @@
         <div id="section-att" class="hidden space-y-6">
             <div class="bg-white rounded-xl shadow-md p-6 border border-gray-200">
                 <h2 class="text-2xl font-bold mb-2 text-blue-600">Attestation Explorer</h2>
-                <p class="text-sm text-gray-500 mb-6">Retrieve signatures for CCTP burn transactions.</p>
+                <p class="text-sm text-gray-500 mb-6">Retrieve message signatures for CCTP burn transactions.</p>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div class="space-y-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">Network</label>
-                            <select id="attNetwork" class="mt-1 block w-full py-2 border border-gray-300 rounded-md">
+                            <label class="block text-sm font-medium text-gray-700">Network Environment</label>
+                            <select id="attNetwork" class="mt-1 block w-full py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
                                 <option value="mainnet">Mainnet</option>
                                 <option value="testnet">Testnet (Sandbox)</option>
                             </select>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Source Domain</label>
-                            <select id="attDomain" class="mt-1 block w-full py-2 border border-gray-300 rounded-md"></select>
+                            <select id="attDomain" class="mt-1 block w-full py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"></select>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">Burn Tx Hash</label>
-                            <input type="text" id="attHash" placeholder="0x..." class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
+                            <label class="block text-sm font-medium text-gray-700">Burn Transaction Hash</label>
+                            <input type="text" id="attHash" placeholder="0x..." class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
                         </div>
-                        <button onclick="fetchAttestation()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded">Fetch Attestation</button>
+                        <button onclick="fetchAttestation()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-sm transition">Fetch Attestation</button>
                     </div>
                     <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 h-fit">
-                        <h3 class="text-xs font-bold text-blue-800 uppercase mb-2">Endpoint URL</h3>
-                        <p id="attUrl" class="text-[10px] break-all font-mono bg-blue-100 p-2 rounded text-blue-900 font-bold">Loading...</p>
+                        <h3 class="text-xs font-bold text-blue-800 uppercase tracking-wider mb-2">Endpoint URL</h3>
+                        <p id="attUrl" class="text-[11px] break-all font-mono bg-blue-100 p-2 rounded text-blue-900 border border-blue-200 font-bold">Loading...</p>
                     </div>
                 </div>
             </div>
@@ -109,8 +118,8 @@
 
         <div class="mt-8">
             <div class="flex justify-between items-center mb-2">
-                <h2 class="text-lg font-semibold">Response JSON</h2>
-                <span id="statusLabel" class="hidden px-2 py-1 rounded text-xs font-bold"></span>
+                <h2 class="text-lg font-semibold text-gray-800">API Response JSON</h2>
+                <span id="statusLabel" class="hidden px-2 py-1 rounded text-xs font-bold shadow-sm"></span>
             </div>
             <pre id="jsonOutput" class="json-container text-sm">No data fetched yet.</pre>
         </div>
@@ -127,15 +136,13 @@
             { id: 22, name: "Plume" }, { id: 25, name: "Starknet" }, { id: 26, name: "Arc" }
         ].sort((a, b) => a.id - b.id);
 
-        // UI Helpers
         function switchTab(tab) {
             document.getElementById('section-fee').classList.toggle('hidden', tab !== 'fee');
             document.getElementById('section-att').classList.toggle('hidden', tab !== 'att');
-            document.getElementById('tab-fee').className = tab === 'fee' ? 'py-4 px-1 text-sm font-medium tab-active' : 'py-4 px-1 text-sm font-medium text-gray-500';
-            document.getElementById('tab-att').className = tab === 'att' ? 'py-4 px-1 text-sm font-medium tab-active' : 'py-4 px-1 text-sm font-medium text-gray-500';
+            document.getElementById('tab-fee').className = tab === 'fee' ? 'py-4 px-1 text-sm font-medium tab-active cursor-pointer' : 'py-4 px-1 text-sm font-medium text-gray-500 cursor-pointer';
+            document.getElementById('tab-att').className = tab === 'att' ? 'py-4 px-1 text-sm font-medium tab-active cursor-pointer' : 'py-4 px-1 text-sm font-medium text-gray-500 cursor-pointer';
         }
 
-        // Initialize Selects
         function init() {
             const selects = ['feeSource', 'feeDest', 'attDomain'];
             selects.forEach(id => {
@@ -157,23 +164,26 @@
         async function apiFetch(url) {
             const out = document.getElementById('jsonOutput');
             const badge = document.getElementById('statusLabel');
-            out.innerText = "Fetching...";
+            out.innerText = "Querying API...";
             badge.classList.add('hidden');
             try {
                 const res = await fetch(url);
                 const data = await res.json();
                 out.innerText = JSON.stringify(data, null, 2);
                 if(url.includes('messages')) processAttStatus(data);
+                if(!res.ok) out.classList.add('text-red-400'); else out.classList.remove('text-red-400');
             } catch (e) { out.innerText = "Error: " + e.message; }
         }
 
         function processAttStatus(data) {
             const badge = document.getElementById('statusLabel');
-            badge.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-yellow-100', 'text-yellow-800');
+            badge.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-yellow-100', 'text-yellow-800', 'bg-red-100', 'text-red-800');
             if (data.messages?.[0]?.attestation && data.messages[0].attestation !== 'PENDING') {
                 badge.innerText = "COMPLETE"; badge.classList.add('bg-green-100', 'text-green-800');
+            } else if (data.messages?.[0]?.attestation === 'PENDING') {
+                badge.innerText = "PENDING"; badge.classList.add('bg-yellow-100', 'text-yellow-800');
             } else {
-                badge.innerText = "PENDING/NOT FOUND"; badge.classList.add('bg-yellow-100', 'text-yellow-800');
+                badge.innerText = "NOT FOUND"; badge.classList.add('bg-red-100', 'text-red-800');
             }
         }
 
