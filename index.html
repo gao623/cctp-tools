@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circle CCTP Toolkit</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .json-container {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            min-height: 100px;
+        }
+        .tab-active { border-bottom: 2px solid #2563eb; color: #2563eb; font-weight: bold; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen">
+
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">C</div>
+                    <span class="text-xl font-bold text-gray-800">CCTP Toolkit</span>
+                </div>
+                <div class="flex space-x-8">
+                    <button onclick="switchTab('fee')" id="tab-fee" class="py-4 px-1 text-sm font-medium transition-all tab-active">Fee Querier</button>
+                    <button onclick="switchTab('att')" id="tab-att" class="py-4 px-1 text-sm font-medium transition-all text-gray-500 hover:text-gray-700">Attestation Explorer</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-5xl mx-auto p-4 md:p-8">
+        
+        <div id="section-fee" class="space-y-6">
+            <div class="bg-white rounded-xl shadow-md p-6 border border-gray-200">
+                <h2 class="text-2xl font-bold mb-2 text-blue-600">CCTP V2 Fee Query</h2>
+                <p class="text-sm text-gray-500 mb-6">Check Transfer and Forward fees across CCTP domains.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Network</label>
+                            <select id="feeNetwork" class="mt-1 block w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                <option value="mainnet">Mainnet</option>
+                                <option value="testnet">Testnet (Sandbox)</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Source</label>
+                                <select id="feeSource" class="mt-1 block w-full py-2 border border-gray-300 rounded-md"></select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Destination</label>
+                                <select id="feeDest" class="mt-1 block w-full py-2 border border-gray-300 rounded-md"></select>
+                            </div>
+                        </div>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" id="feeForward" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                            <span class="text-sm font-medium text-gray-700">Forward Fee?</span>
+                        </label>
+                        <button onclick="fetchFee()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded">Fetch Fees</button>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 h-fit">
+                        <h3 class="text-xs font-bold text-blue-800 uppercase mb-2">Endpoint URL</h3>
+                        <p id="feeUrl" class="text-[10px] break-all font-mono bg-blue-100 p-2 rounded text-blue-900">Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="section-att" class="hidden space-y-6">
+            <div class="bg-white rounded-xl shadow-md p-6 border border-gray-200">
+                <h2 class="text-2xl font-bold mb-2 text-blue-600">Attestation Explorer</h2>
+                <p class="text-sm text-gray-500 mb-6">Retrieve signatures for CCTP burn transactions.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Network</label>
+                            <select id="attNetwork" class="mt-1 block w-full py-2 border border-gray-300 rounded-md">
+                                <option value="mainnet">Mainnet</option>
+                                <option value="testnet">Testnet (Sandbox)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Source Domain</label>
+                            <select id="attDomain" class="mt-1 block w-full py-2 border border-gray-300 rounded-md"></select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Burn Tx Hash</label>
+                            <input type="text" id="attHash" placeholder="0x..." class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
+                        </div>
+                        <button onclick="fetchAttestation()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded">Fetch Attestation</button>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 h-fit">
+                        <h3 class="text-xs font-bold text-blue-800 uppercase mb-2">Endpoint URL</h3>
+                        <p id="attUrl" class="text-[10px] break-all font-mono bg-blue-100 p-2 rounded text-blue-900 font-bold">Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8">
+            <div class="flex justify-between items-center mb-2">
+                <h2 class="text-lg font-semibold">Response JSON</h2>
+                <span id="statusLabel" class="hidden px-2 py-1 rounded text-xs font-bold"></span>
+            </div>
+            <pre id="jsonOutput" class="json-container text-sm">No data fetched yet.</pre>
+        </div>
+    </main>
+
+    <script>
+        const domains = [
+            { id: 0, name: "Ethereum" }, { id: 1, name: "Avalanche" }, { id: 2, name: "OP Mainnet" },
+            { id: 3, name: "Arbitrum" }, { id: 4, name: "Solana" }, { id: 5, name: "Base" },
+            { id: 6, name: "Polygon PoS" }, { id: 7, name: "Noble" }, { id: 10, name: "Unichain" },
+            { id: 11, name: "Linea" }, { id: 13, name: "Sonic" }, { id: 14, name: "World Chain" },
+            { id: 15, name: "Monad" }, { id: 16, name: "Sei" }, { id: 17, name: "BNB Smart Chain" },
+            { id: 18, name: "XDC" }, { id: 19, name: "HyperEVM" }, { id: 21, name: "Ink" },
+            { id: 22, name: "Plume" }, { id: 25, name: "Starknet" }, { id: 26, name: "Arc" }
+        ].sort((a, b) => a.id - b.id);
+
+        // UI Helpers
+        function switchTab(tab) {
+            document.getElementById('section-fee').classList.toggle('hidden', tab !== 'fee');
+            document.getElementById('section-att').classList.toggle('hidden', tab !== 'att');
+            document.getElementById('tab-fee').className = tab === 'fee' ? 'py-4 px-1 text-sm font-medium tab-active' : 'py-4 px-1 text-sm font-medium text-gray-500';
+            document.getElementById('tab-att').className = tab === 'att' ? 'py-4 px-1 text-sm font-medium tab-active' : 'py-4 px-1 text-sm font-medium text-gray-500';
+        }
+
+        // Initialize Selects
+        function init() {
+            const selects = ['feeSource', 'feeDest', 'attDomain'];
+            selects.forEach(id => {
+                const el = document.getElementById(id);
+                domains.forEach(d => el.add(new Option(`${d.name} (${d.id})`, d.id)));
+            });
+            document.getElementById('feeDest').selectedIndex = 1;
+            updateUrls();
+        }
+
+        function updateUrls() {
+            const feeBase = document.getElementById('feeNetwork').value === 'mainnet' ? 'https://iris-api.circle.com' : 'https://iris-api-sandbox.circle.com';
+            document.getElementById('feeUrl').innerText = `${feeBase}/v2/burn/USDC/fees/${document.getElementById('feeSource').value}/${document.getElementById('feeDest').value}${document.getElementById('feeForward').checked ? '?forward=true' : ''}`;
+            
+            const attBase = document.getElementById('attNetwork').value === 'mainnet' ? 'https://iris-api.circle.com' : 'https://iris-api-sandbox.circle.com';
+            document.getElementById('attUrl').innerText = `${attBase}/v2/messages/${document.getElementById('attDomain').value}?transactionHash=${document.getElementById('attHash').value || '{txHash}'}`;
+        }
+
+        async function apiFetch(url) {
+            const out = document.getElementById('jsonOutput');
+            const badge = document.getElementById('statusLabel');
+            out.innerText = "Fetching...";
+            badge.classList.add('hidden');
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+                out.innerText = JSON.stringify(data, null, 2);
+                if(url.includes('messages')) processAttStatus(data);
+            } catch (e) { out.innerText = "Error: " + e.message; }
+        }
+
+        function processAttStatus(data) {
+            const badge = document.getElementById('statusLabel');
+            badge.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-yellow-100', 'text-yellow-800');
+            if (data.messages?.[0]?.attestation && data.messages[0].attestation !== 'PENDING') {
+                badge.innerText = "COMPLETE"; badge.classList.add('bg-green-100', 'text-green-800');
+            } else {
+                badge.innerText = "PENDING/NOT FOUND"; badge.classList.add('bg-yellow-100', 'text-yellow-800');
+            }
+        }
+
+        function fetchFee() { apiFetch(document.getElementById('feeUrl').innerText); }
+        function fetchAttestation() { apiFetch(document.getElementById('attUrl').innerText); }
+
+        document.querySelectorAll('select, input').forEach(el => el.addEventListener('input', updateUrls));
+        init();
+    </script>
+</body>
+</html>
