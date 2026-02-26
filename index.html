@@ -47,7 +47,6 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Network Environment</label>
                             <select id="feeNetwork" class="mt-1 block w-full py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                            <!-- <select id="feeNetwork" class="mt-1 block w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"> -->
                                 <option value="mainnet">Mainnet</option>
                                 <option value="testnet">Testnet (Sandbox)</option>
                             </select>
@@ -63,9 +62,16 @@
                             <select id="feeDest" class="mt-1 block w-full py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"></select>
                         </div>
 
-                        <div class="flex items-center space-x-2 pt-2">
+                        <div class="flex flex-col space-y-2 pt-2">
+                        <div class="flex items-center space-x-2">
                             <input type="checkbox" id="feeForward" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
                             <label for="feeForward" class="text-sm font-medium text-gray-700 cursor-pointer">Forward Fee? (Optional)</label>
+                            </div>
+
+                            <div id="ataOptionContainer" class="hidden flex items-center space-x-2">
+                                <input type="checkbox" id="feeAta" class="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
+                                <label for="feeAta" class="text-sm font-medium text-gray-700 cursor-pointer">Include ATA Creation Fee? (Solana Only)</label>
+                            </div>
                         </div>
 
                         <button onclick="fetchFee()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-sm transition">Fetch Fee Data</button>
@@ -77,7 +83,8 @@
                             <p id="feeUrl" class="text-[11px] break-all font-mono bg-blue-100 p-2 rounded text-blue-900 border border-blue-200">Loading...</p>
                             <div class="mt-4 text-xs text-gray-600 space-y-1">
                                 <p>• <b>Transfer Fee:</b> Standard CCTP burn/mint fee.</p>
-                                <p>• <b>Forward Fee:</b> Fee for automatic execution via forwarder contract.</p>
+                                <p>• <b>Forward Fee:</b> Fee for automatic execution via forwarder.</p>
+                                <p id="ataDesc" class="hidden text-purple-700 font-medium">• <b>ATA Fee:</b> Rent fee for creating Associated Token Account on Solana.</p>
                             </div>
                         </div>
                     </div>
@@ -89,13 +96,11 @@
             <div class="bg-white rounded-xl shadow-md p-6 border border-gray-200">
                 <h2 class="text-2xl font-bold mb-2 text-blue-600">Attestation Explorer</h2>
                 <p class="text-sm text-gray-500 mb-6">Retrieve message signatures for CCTP burn transactions.</p>
-                
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Network Environment</label>
                             <select id="attNetwork" class="mt-1 block w-full py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                            <!-- <select id="feeNetwork" class="mt-1 block w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"> -->
                                 <option value="mainnet">Mainnet</option>
                                 <option value="testnet">Testnet (Sandbox)</option>
                             </select>
@@ -157,9 +162,35 @@
         }
 
         function updateUrls() {
+            const source = document.getElementById('feeSource').value;
+            const dest = document.getElementById('feeDest').value;
+            const isForward = document.getElementById('feeForward').checked;
+            const isAta = document.getElementById('feeAta').checked;
+
+            // Logic: Show ATA option only when Destination is Solana (5)
+            const ataContainer = document.getElementById('ataOptionContainer');
+            const ataDesc = document.getElementById('ataDesc');
+            if (dest === "5") {
+                ataContainer.classList.remove('hidden');
+                ataDesc.classList.remove('hidden');
+            } else {
+                ataContainer.classList.add('hidden');
+                ataDesc.classList.add('hidden');
+                document.getElementById('feeAta').checked = false; // Non-Solana automatically uncheck
+            }
+
             const feeBase = document.getElementById('feeNetwork').value === 'mainnet' ? 'https://iris-api.circle.com' : 'https://iris-api-sandbox.circle.com';
-            document.getElementById('feeUrl').innerText = `${feeBase}/v2/burn/USDC/fees/${document.getElementById('feeSource').value}/${document.getElementById('feeDest').value}${document.getElementById('feeForward').checked ? '?forward=true' : ''}`;
-            
+
+            // Build Query Parameters
+            let params = [];
+            if (isForward) params.push('forward=true');
+            // Only add includeAtaCreation when it is Solana and the user selects it.
+            if (dest === "5" && isAta) params.push('includeAtaCreation=true');
+
+            const queryString = params.length > 0 ? `?${params.join('&')}` : '';
+
+            document.getElementById('feeUrl').innerText = `${feeBase}/v2/burn/USDC/fees/${source}/${dest}${queryString}`;
+
             const attBase = document.getElementById('attNetwork').value === 'mainnet' ? 'https://iris-api.circle.com' : 'https://iris-api-sandbox.circle.com';
             document.getElementById('attUrl').innerText = `${attBase}/v2/messages/${document.getElementById('attDomain').value}?transactionHash=${document.getElementById('attHash').value || '{txHash}'}`;
         }
